@@ -3,7 +3,7 @@
  * C7_StoreInfoManagement/StoreInfoAPI.php
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.10
+ * 日付：2025.06.15
  * 概要: C7 店舗情報管理部のモジュールを定義するファイル。
  * Google Places APIとの具体的な連携（URL生成、API呼び出し、レスポンスの整形）を担当する。
  */
@@ -12,7 +12,8 @@
 define('GOOGLE_PLACES_API_KEY', 'AIzaSyDZ2e4P7njfO8tIKbAdp3_2WYZIpJH3bSo'); 
 
 // 検索の中心地点（芝浦工業大学豊洲キャンパスの緯度経度）
-define('DEFAULT_SEARCH_LOCATION', '35.6606,139.7945');
+define('DEFAULT_SEARCH_LOCATION_LAT', 35.6606); // 緯度
+define('DEFAULT_SEARCH_LOCATION_LNG', 139.7945); // 経度
 
 // Google Places APIのエンドポイントURL
 define('PLACES_API_TEXTSEARCH_ENDPOINT', 'https://maps.googleapis.com/maps/api/place/textsearch/json');
@@ -46,7 +47,7 @@ function BuildPlaceAPIRequestURL(string $genre, int $distance, int $price): stri
 
     $params = [
         'query' => $search_query,
-        'location' => DEFAULT_SEARCH_LOCATION, 
+        'location' => DEFAULT_SEARCH_LOCATION_LAT . ',' . DEFAULT_SEARCH_LOCATION_LNG, 
         'radius' => $distance,
         'key' => GOOGLE_PLACES_API_KEY,
         'language' => 'ja'
@@ -79,16 +80,18 @@ function RequestPlaceAPI(string $request_url): array
 /**
  * C7 M1.3 店舗一覧生成処理 (FormatAPIResponse)
  * 担当者: 鈴木 馨
- * 機能概要: Google Places API から取得した JSON データから、店舗名・ジャンル・距離・価格帯・評価など
- * 必要な情報のみを抽出し、評価降順でソートしたリストを生成して返却する。
+ * 機能概要: Google Place API から取得した JSON データから，店舗名・ジャンル・距離・評価など
+ * 必要な情報のみを抽出し，評価降順でソートと芝浦工業大学豊洲キャンパスとの距離を計算し，
+ * 成形したリストを生成して返却する．
  *
  * 引数： array|null $raw_response Places APIの検索結果の生データ (連想配列)。
  * 引数： bool $success M1.2での通信が成功していたか。
+ * 引数： int $max_distance 選択した距離
  * 返却値： array 以下のキーを含む結果配列:
  * - 'SearchResult': array 抽出・整形・ソート済みの店舗リスト。
  * - 'is_success': bool 処理が成功したら true、API通信失敗時は false。
  */
-function FormatAPIResponse(?array $raw_response, bool $success): array
+function FormatAPIResponse(?array $raw_response, bool $success, int $max_distance): array
 {
     if (!$success || $raw_response === null) {
         return ['SearchResult' => [], 'is_success' => false]; // E1: API通信失敗
@@ -97,26 +100,38 @@ function FormatAPIResponse(?array $raw_response, bool $success): array
     $stores = [];
     if (isset($raw_response['results']) && is_array($raw_response['results'])) {
         foreach ($raw_response['results'] as $place) {
+            $store_lat = $place['geometry']['location']['lat'] ?? 0.0;
+            $store_lng = $place['geometry']['location']['lng'] ?? 0.0;
+            
+            // 距離を計算
+            $R = 6371000; // 地球の半径（メートル）
+            $dLat = deg2rad($store_lat - DEFAULT_SEARCH_LOCATION_LAT);
+            $dLon = deg2rad($store_lng - DEFAULT_SEARCH_LOCATION_LNG);
+
+            $a = sin($dLat / 2) * sin($dLat / 2) +
+                 cos(deg2rad(DEFAULT_SEARCH_LOCATION_LAT)) * cos(deg2rad($store_lat)) *
+                 sin($dLon / 2) * sin($dLon / 2);
+            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+            $calculated_distance = $R * $c;
+
+            // 計算した距離が指定された最大距離を超える場合はスキップ
+            if ($max_distance > 0 && $calculated_distance > $max_distance) {
+                continue; // この店舗は結果に含めない
+            }
+
             $stores[] = [
                 'place_id' => $place['place_id'] ?? null,
                 'name' => $place['name'] ?? '名称不明',
                 'rating' => $place['rating'] ?? 0.0,
-                'user_ratings_total' => $place['user_ratings_total'] ?? 0,
-                'vicinity' => $place['vicinity'] ?? '住所不明',
+                'distance' => round($calculated_distance), // メートル単位で整数に丸める
             ];
         }
 
-        //デバック用
-        //error_log("--- Before Sort ---");
-        //error_log(print_r($stores, true)); // ソート前の$storesの内容を確認
-
+        //評価降下順でソート
         usort($stores, function($a, $b) {
             return $b['rating'] <=> $a['rating'];
         });
 
-        //デバック用
-        //error_log("--- After Sort ---");
-        //error_log(print_r($stores, true)); // ソート後の$storesの内容を確認
     }
 
     return ['SearchResult' => $stores, 'is_success' => true];
@@ -149,7 +164,7 @@ function StoreSearchRequestMain(string $genre, int $price, int $distance): array
         ];
     }
 
-    $formatted_results = FormatAPIResponse($api_response['raw_response'], $api_response['success']);
+    $formatted_results = FormatAPIResponse($api_response['raw_response'], $api_response['success'], $distance);
 
     if (!$formatted_results['is_success']) {
         return [
