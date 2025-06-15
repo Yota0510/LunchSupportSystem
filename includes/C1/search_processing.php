@@ -3,7 +3,7 @@
  * search_processing.php
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.10
+ * 日付：2025.06.15
  * 概要: C1 UI処理部 M4店舗検索主処理のうち、
  * 下位モジュール（GetSearchCondition, SendSearchRequest, DisplayStoreList, DisplayNoResult）
  * を定義するファイル。
