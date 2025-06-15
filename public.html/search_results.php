@@ -3,7 +3,7 @@
  * search_results.php (W6 店舗表示一覧画面)
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.10
+ * 日付：2025.06.15
  * 概要: 店舗検索の条件が一致する店舗一覧を表示する
  * 対応コンポーネント: C1 UI処理部
  * 対応モジュール: W5 検索画面のUI表示, M4.3 店舗表示一覧画面表示処理
@@ -55,24 +55,72 @@ $display_distance_km = $distance_param / 1000;
     <title>店舗検索結果</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
+            font-family: 'MS Gothic', 'Meiryo', 'メイリオ', sans-serif; /* フォントを統一 */
+            margin: 0; /* マージンをリセット */
+            background-color: #f0f2f5; /* 背景色 */
             color: #333;
             line-height: 1.6;
+            min-height: 100vh; /* 画面いっぱいの高さを確保 */
+            box-sizing: border-box;
+            text-align: center;
         }
         .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 800px;
-            margin: 30px auto;
+            background-color: #e0f7fa; /* 背景色を水色に変更 */
+            padding: 80px 50px 40px 50px; /* 上部のパディングを増やしてタイトルスペースを確保 */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 1200px; /* 検索フォームと幅を合わせる */
+            width: 90%;
+            box-sizing: border-box;
+            margin: 20px auto;
+            position: relative; /* 子要素の絶対配置の基準にする */
+            min-height: 700px; /* ある程度の高さを確保しつつ、検索結果が増えれば伸びる */
+            display: flex; /* Flexboxを適用 */
+            flex-direction: column; /* 要素を縦方向に並べる */
+            align-items: center; /* 中央揃え (横方向) */
+            padding-top: 150px; /* コンテンツ全体を下に移動 */
         }
-        h1, h2 {
+        
+        /* タイトルバー（店舗表示一覧）のスタイル */
+        .top-bar {
+            display: flex;
+            justify-content: space-between; /* 左右に配置 */
+            align-items: center;
+            width: 100%;
+            position: absolute; /* コンテナの左上に配置 */
+            top: 20px;
+            left: 0;
+            padding: 0 20px; /* 左右のパディング */
+            box-sizing: border-box;
+        }
+
+        .title-left {
+            background-color: #ffffff;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 40px;
+            font-weight: 900;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 { /* PHPで出力される店舗検索結果のH1は非表示 */
+            display: none;
+        }
+        
+        h2 { /* 見つかった店舗数表示のH2 */
             color: #0056b3;
             text-align: center;
             margin-bottom: 20px;
+            margin-top: 0; /* 上部の余白をリセット */
+            font-size: 25px;
+        }
+
+        .store-list { /* 店舗アイテムを囲むdivを追加 */
+            width: 100%; /* 親要素の幅いっぱいに */
+            max-width: 800px; /* 店舗アイテムの最大幅に合わせる */
+            margin-bottom: 80px; /* 戻るボタンとのスペースを確保 */
         }
 
         .store-item {
@@ -83,8 +131,9 @@ $display_distance_km = $distance_param / 1000;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
-            flex-direction: column; /* 縦方向に要素を並べる */
-            gap: 10px; /* 要素間のスペース */
+            flex-direction: column;
+            gap: 10px;
+            text-align: left; /* テキストを左揃えにする */
         }
         .store-header {
             display: flex;
@@ -95,7 +144,7 @@ $display_distance_km = $distance_param / 1000;
         }
         .store-name {
             font-weight: bold;
-            font-size: 1.5em; /* 少し大きめ */
+            font-size: 25px;
             color: #333;
             flex-grow: 1;
         }
@@ -107,20 +156,21 @@ $display_distance_km = $distance_param / 1000;
             text-decoration: underline;
         }
         .store-rating {
-            font-size: 1em;
+            font-size: 20px;
             color: #777;
             white-space: nowrap;
+            font-weight: bold;
         }
-        .store-details-group { /* 新しいクラス名 */
-            font-size: 0.95em;
+        .store-details-group {
+            font-size: 18px;
             color: #555;
-            margin-top: 5px; /* 上の要素との間のスペース */
-            line-height: 1.8; /* 行の高さ */
-            display: flex; /* 各情報を横に並べるためにFlexboxを使用 */
-            flex-wrap: wrap; /* 必要に応じて折り返す */
-            gap: 10px 20px; /* 縦方向10px, 横方向20pxのギャップ */
+            margin-top: 5px;
+            line-height: 1.8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            font-weight: bold;
         }
-        /* 各情報項目はspanタグでそのまま */
 
         .no-results, .error-message {
             text-align: center;
@@ -136,27 +186,53 @@ $display_distance_km = $distance_param / 1000;
             background-color: #f8d7da;
             color: #721c24;
         }
+        
+        /* 検索画面に戻るボタンのスタイル調整 */
         .back-button {
             display: block;
-            width: 100%;
-            padding: 10px 15px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
+            width: 100%; /* 親要素の幅に合わせる */
+            max-width: 400px; /* ここで横幅を統一 (search_form.php と合わせる) */
+            padding: 5px 0px; /* 検索フォームのボタンとパディングを合わせる */
+            background-color: #ffffff; /* 白に変更 */
+            color: #000000; /* 黒に変更 */
+            border: 1px solid #ddd; /* 枠線を追加 */
             border-radius: 4px;
-            font-size: 1em;
+            font-size: 25px; /* 検索フォームのボタンとフォントサイズを合わせる */
             cursor: pointer;
             text-align: center;
             text-decoration: none;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease; /* ホバー時のトランジション */
+
+            position: absolute; /* 絶対配置 */
+            bottom: 20px; /* 画面下からの距離 */
+            left: 50px; /* 画面左からの距離 */
+            margin-top: 0; /* 不要なマージンをリセット */
         }
         .back-button:hover {
-            background-color: #5a6268;
+            background-color: #f0f0f0;
+            border-color: #aaa;
         }
 
         /* レスポンシブ対応 */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) { /* 768pxに基準を変更 */
+            .container {
+                padding: 60px 30px 25px 30px;
+                max-width: 95%;
+                margin-top: 10px;
+                min-height: 400px;
+                padding-top: 100px; /* モバイルでのパディングも調整 */
+            }
+            .top-bar {
+                top: 10px;
+                padding: 0 10px;
+            }
+            .title-left {
+                font-size: 1.2em;
+                padding: 8px 15px;
+            }
+            .store-item {
+                padding: 10px; /* モバイルでのパディングを小さく */
+            }
             .store-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -164,31 +240,49 @@ $display_distance_km = $distance_param / 1000;
             .store-name {
                 width: 100%;
                 text-align: left;
+                font-size: 1.3em; /* モバイルでのフォントサイズ調整 */
             }
             .store-rating {
                 width: 100%;
                 text-align: left;
+                font-size: 0.9em; /* モバイルでのフォントサイズ調整 */
             }
             .store-details-group {
-                flex-direction: column; /* スマホでは縦並び */
-                gap: 5px; /* 縦並び時の間隔 */
+                flex-direction: column;
+                gap: 5px;
+                font-size: 0.9em; /* モバイルでのフォントサイズ調整 */
             }
-            /* .detail-item はspanタグなので特に幅の指定は不要 */
+            .back-button {
+                max-width: 100%; /* モバイルでは横幅100% */
+                position: static; /* 絶対配置解除 */
+                margin-top: 15px;
+                margin-left: auto;
+                margin-right: auto;
+                bottom: unset;
+                left: unset;
+                font-size: 1em; /* モバイルでのフォントサイズ調整 */
+                padding: 10px 15px; /* モバイルでのパディング調整 */
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>店舗検索結果</h1>
+        <div class="top-bar">
+            <div class="title-left">店舗表示一覧</div>
+        </div>
 
         <?php if (!empty($api_error_message)): ?>
             <div class="error-message">
                 <p><?php echo $api_error_message; ?></p>
             </div>
         <?php elseif (empty($search_results)): ?>
-            <?php else: ?>
+            <div class="no-results">
+                <p>該当する店舗が見つかりませんでした。</p>
+            </div>
+        <?php else: ?>
             <h2>見つかった店舗 (<?php echo count($search_results); ?>件):</h2>
-            <?php foreach ($search_results as $store): ?>
+            <div class="store-list"> <?php foreach ($search_results as $store): ?>
                 <div class="store-item">
                     <div class="store-header">
                         <div class="store-name">
@@ -212,13 +306,13 @@ $display_distance_km = $distance_param / 1000;
                                 echo '〜' . htmlspecialchars($price) . '円';
                             }
                         ?></span>
-                        <span class="detail-item">距離: <?php echo htmlspecialchars($display_distance_km); ?>km以内</span>
+                        <span class="detail-item">距離: <?php echo htmlspecialchars($store['distance']); ?>m</span>
                     </div>
                 </div>
             <?php endforeach; ?>
-        <?php endif; ?>
+            </div> <?php endif; ?>
 
-        <a href="search_form.php" class="back-button">検索画面に戻る</a>
+        <a href="search_form.php" class="back-button">検索に戻る</a>
     </div>
 </body>
 </html>
