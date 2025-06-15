@@ -1,9 +1,9 @@
 <?php
 /**
  * ファイル名：search_form.php (W5 検索画面)
- * 版名：V1.0
+ * 版名：V1.1
  * 作成者：鈴木 馨
- * 日付：2025.06.10
+ * 日付：2025.06.15
  * 機能要約: 店舗検索の条件を入力するフォームを表示し、
  * フォーム送信時にM4 店舗検索主処理 (StoreSearchMain) を呼び出す。
  * 対応コンポーネント: C1 UI処理部
@@ -85,87 +85,210 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
     <title>店舗検索 - 検索条件入力</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 30px auto;
-        }
-        h1 {
-            color: #0056b3;
+            font-family: 'MS Gothic', 'Meiryo', 'メイリオ', sans-serif; /* フォントを統一 */
+            margin: 0; /* マージンをリセット */
+            background-color: #f0f2f5; /* 背景色 */
+            color: #333; /* 文字色 */
+            line-height: 1.6; /* 行の高さ */
+            min-height: 100vh; /* 画面いっぱいの高さを確保 */
+            box-sizing: border-box;
             text-align: center;
-            margin-bottom: 30px;
         }
+        /* コンテナのスタイル */
+        .container {
+            background-color: #e0f7fa; /* 背景色を水色に変更 */
+            padding: 80px 50px 40px 50px; /* 上部のパディングを増やしてタイトルスペースを確保 */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 1200px; /* 検索フォームと幅を合わせる */
+            width: 90%;
+            box-sizing: border-box;
+            margin: 20px auto;
+            position: relative; /* 子要素の絶対配置の基準にする */
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 150px; 
+            box-sizing: border-box; 
+        }
+        /* トップバーのスタイル */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            top: 20px;
+            left: 0;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            display: none;
+        }
+        /* 左上のタイトル (店舗検索) のスタイル */
+        .title-left {
+            background-color: #ffffff;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 40px;
+            font-weight: 900;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* フォームグループのスタイル */
         .form-group {
             margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
-        select {
             width: 100%;
+            max-width: 650px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 30px;
+            padding-left: 50px;
+            box-sizing: border-box;
+        }
+        /* ラベルのスタイル */
+        label {
+            margin-bottom: 0;
+            font-weight: 900;
+            color: #555;
+            font-size: 45px;
+            white-space: nowrap;
+            width: 250px;
+            min-width: 180px;
+        }
+        /* セレクトボックスのスタイル */
+        select {
+            flex-grow: 1;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 1em;
+            font-size: 30px;
             background-color: #f9f9f9;
             box-sizing: border-box;
+            height: 60px;
         }
-        button {
+        /* 検索ボタンのスタイル */
+        button[type="submit"] {
             display: block;
             width: 100%;
-            padding: 12px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
+            max-width: 400px;
+            padding: 5px 10px;
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 1.1em;
+            font-size: 35px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-top: 50px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            bottom: unset;
+            left: unset;
         }
-        button:hover {
-            background-color: #0056b3;
+        /* 検索ボタンの押した時のスタイル */
+        button[type="submit"]:hover {
+            background-color: #f0f0f0;
+            border-color: #aaa;
         }
+        /* エラーメッセージのスタイル */
         .error-message {
             color: #dc3545;
             text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
         }
+        /* スタートに戻るボタンのスタイル */
         .back-button {
             display: block;
             width: 100%;
-            padding: 10px 15px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
+            max-width: 400px;
+            padding: 5px 0px;
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 1em;
+            font-size: 25px;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            
+            position: absolute;
+            bottom: 20px;
+            left: 5px;
+            margin-top: 0;
         }
+        /* スタートに戻るボタンの押した時のスタイル */
         .back-button:hover {
-            background-color: #5a6268;
+            background-color: #f0f0f0;
+            border-color: #aaa;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 60px 30px 25px 30px;
+                max-width: 95%;
+                margin-top: 10px;
+                min-height: 400px;
+                padding-top: 100px; /* モバイルでのパディング調整 */
+            }
+            .top-bar {
+                top: 10px;
+                padding: 0 10px;
+            }
+            .title-left {
+                font-size: 1.2em;
+                padding: 8px 15px;
+            }
+            .form-group {
+                max-width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                padding-left: 0;
+            }
+            .form-group label {
+                font-size: 1.1em;
+                width: auto;
+                min-width: auto;
+            }
+            .form-group select {
+                font-size: 1em;
+                height: auto;
+            }
+            button[type="submit"] {
+                max-width: 100%;
+                margin-top: 20px;
+                position: static;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .back-button {
+                max-width: 100%;
+                position: static;
+                margin-top: 15px;
+                margin-left: auto;
+                margin-right: auto;
+                bottom: unset;
+                left: unset;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>店舗検索</h1>
+        <div class="top-bar">
+            <div class="title-left">店舗検索</div>
+        </div>
 
         <?php if (!empty($error_message)): ?>
             <div class="error-message">
@@ -175,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
 
         <form action="search_form.php" method="GET">
             <div class="form-group">
-                <label for="genre">ジャンル:</label>
+                <label for="genre">ジャンル :</label>
                 <select id="genre" name="genre">
                     <option value="" <?php echo (!isset($_GET['genre']) || ($_GET['genre'] ?? '') === '') ? 'selected' : ''; ?>>指定なし</option>
                     <option value="居酒屋" <?php echo ($_GET['genre'] ?? '') === '居酒屋' ? 'selected' : ''; ?>>居酒屋</option>
@@ -190,20 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
             </div>
 
             <div class="form-group">
-                <label for="distance">距離 (半径):</label>
-                <select id="distance" name="distance">
-                    <option value="0" <?php echo (!isset($_GET['distance']) || ((int)($_GET['distance'] ?? 0)) === 0) ? 'selected' : ''; ?>>指定なし</option>
-                    <option value="500" <?php echo ((int)($_GET['distance'] ?? 0)) === 500 ? 'selected' : ''; ?>>〜0.5km (500m)</option>
-                    <option value="1000" <?php echo ((int)($_GET['distance'] ?? 0)) === 1000 ? 'selected' : ''; ?>>〜1.0km (1000m)</option>
-                    <option value="1500" <?php echo ((int)($_GET['distance'] ?? 0)) === 1500 ? 'selected' : ''; ?>>〜1.5km (1500m)</option>
-                    <option value="2000" <?php echo ((int)($_GET['distance'] ?? 0)) === 2000 ? 'selected' : ''; ?>>〜2.0km (2000m)</option>
-                    <option value="3000" <?php echo ((int)($_GET['distance'] ?? 0)) === 3000 ? 'selected' : ''; ?>>〜3.0km (3000m)</option>
-                    <option value="5000" <?php echo ((int)($_GET['distance'] ?? 0)) === 5000 ? 'selected' : ''; ?>>〜5.0km (5000m)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="price">金額 (一人あたり):</label>
+                <label for="price">金額 :</label>
                 <select id="price" name="price">
                     <option value="0" <?php echo (!isset($_GET['price']) || ((int)($_GET['price'] ?? 0)) === 0) ? 'selected' : ''; ?>>指定なし</option>
                     <option value="500" <?php echo ((int)($_GET['price'] ?? 0)) === 500 ? 'selected' : ''; ?>>〜500円</option>
@@ -215,11 +325,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
                 </select>
             </div>
 
+
+            <div class="form-group">
+                <label for="distance">距離 :</label>
+                <select id="distance" name="distance">
+                    <option value="0" <?php echo (!isset($_GET['distance']) || ((int)($_GET['distance'] ?? 0)) === 0) ? 'selected' : ''; ?>>指定なし</option>
+                    <option value="500" <?php echo ((int)($_GET['distance'] ?? 0)) === 500 ? 'selected' : ''; ?>>〜0.5km (500m)</option>
+                    <option value="1000" <?php echo ((int)($_GET['distance'] ?? 0)) === 1000 ? 'selected' : ''; ?>>〜1.0km (1000m)</option>
+                    <option value="1500" <?php echo ((int)($_GET['distance'] ?? 0)) === 1500 ? 'selected' : ''; ?>>〜1.5km (1500m)</option>
+                    <option value="2000" <?php echo ((int)($_GET['distance'] ?? 0)) === 2000 ? 'selected' : ''; ?>>〜2.0km (2000m)</option>
+                    <option value="3000" <?php echo ((int)($_GET['distance'] ?? 0)) === 3000 ? 'selected' : ''; ?>>〜3.0km (3000m)</option>
+                    <option value="5000" <?php echo ((int)($_GET['distance'] ?? 0)) === 5000 ? 'selected' : ''; ?>>〜5.0km (5000m)</option>
+                </select>
+            </div>
+
             <input type="hidden" name="search" value="1">
 
-            <button type="submit">検索する</button>
+            <button type="submit">検索</button>
         </form>
-        <a href="index.php" class="back-button">スタート画面に戻る</a>
+        <a href="start.php" class="back-button">スタートに戻る</a>
     </div>
 </body>
 </html>
