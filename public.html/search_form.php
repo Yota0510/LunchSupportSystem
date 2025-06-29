@@ -4,7 +4,7 @@
  * 版名：V1.1
  * 作成者：鈴木 馨
  * 日付：2025.06.15
- * 機能要約: 店舗検索の条件を入力するフォームを表示し、
+ * 概要: 店舗検索の条件を入力するフォームを表示し、
  * フォーム送信時にM4 店舗検索主処理 (StoreSearchMain) を呼び出す。
  * 対応コンポーネント: C1 UI処理部
  * 対応モジュール: W5 検索画面のUI表示, M4 店舗検索主処理
@@ -304,10 +304,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['search'])) {
                     <option value="居酒屋" <?php echo ($_GET['genre'] ?? '') === '居酒屋' ? 'selected' : ''; ?>>居酒屋</option>
                     <option value="イタリアン" <?php echo ($_GET['genre'] ?? '') === 'イタリアン' ? 'selected' : ''; ?>>イタリアン</option>
                     <option value="和食" <?php echo ($_GET['genre'] ?? '') === '和食' ? 'selected' : ''; ?>>和食</option>
+                    <option value="洋食" <?php echo ($_GET['genre'] ?? '') === '洋食' ? 'selected' : ''; ?>>洋食</option>
                     <option value="中華" <?php echo ($_GET['genre'] ?? '') === '中華' ? 'selected' : ''; ?>>中華</option>
                     <option value="カフェ" <?php echo ($_GET['genre'] ?? '') === 'カフェ' ? 'selected' : ''; ?>>カフェ</option>
                     <option value="ラーメン" <?php echo ($_GET['genre'] ?? '') === 'ラーメン' ? 'selected' : ''; ?>>ラーメン</option>
                     <option value="焼肉" <?php echo ($_GET['genre'] ?? '') === '焼肉' ? 'selected' : ''; ?>>焼肉</option>
+                    <option value="ファストフード" <?php echo ($_GET['genre'] ?? '') === 'ファストフード' ? 'selected' : ''; ?>>ファストフード</option>
+                    <option value="おにぎり" <?php echo ($_GET['genre'] ?? '') === 'おにぎり' ? 'selected' : ''; ?>>おにぎり</option>
+                    <option value="和風カフェ" <?php echo ($_GET['genre'] ?? '') === '和風カフェ' ? 'selected' : ''; ?>>和風カフェ</option>
+                    <option value="うなぎ" <?php echo ($_GET['genre'] ?? '') === 'うなぎ' ? 'selected' : ''; ?>>うなぎ</option>
+                    <option value="パスタ" <?php echo ($_GET['genre'] ?? '') === 'パスタ' ? 'selected' : ''; ?>>パスタ</option>
+                    <option value="和風定食" <?php echo ($_GET['genre'] ?? '') === '和風定食' ? 'selected' : ''; ?>>和風定食</option>
+                    <option value="とんかつ" <?php echo ($_GET['genre'] ?? '') === 'とんかつ' ? 'selected' : ''; ?>>とんかつ</option>
+                    <option value="サンドイッチ" <?php echo ($_GET['genre'] ?? '') === 'サンドイッチ' ? 'selected' : ''; ?>>サンドイッチ</option>
+                    <option value="アサイー" <?php echo ($_GET['genre'] ?? '') === 'アサイー' ? 'selected' : ''; ?>>アサイー</option>
                     <option value="その他" <?php echo ($_GET['genre'] ?? '') === 'その他' ? 'selected' : ''; ?>>その他</option>
                 </select>
             </div>
