@@ -37,6 +37,7 @@ function handleNavigationError(string $errorMessage): void
 /**
  * M2.1 スタート画面遷移処理 (C1 UI処理部)
  * 担当者：樋口 智也
+ * 日付：2025.06.17
  * 関数名: MoveToStart
  * 機能概要: W4, W7, W8 画面から W2 スタート画面へ遷移する。
  * 引数:
@@ -57,6 +58,7 @@ function MoveToStart(string $action): void
 /**
  * M2.2 気分診断画面遷移処理 (C1 UI処理部)
  * 担当者：田口 陽太
+ * 日付：2025.06.17
  * 関数名: MoveToMood
  * 機能概要: W2 スタート画面から W3 気分診断画面へ遷移する。
  * 引数:
@@ -77,6 +79,7 @@ function MoveToMood(string $action): void
 /**
  * M2.3 検索画面遷移処理 (C1 UI処理部)
  * 担当者：鈴木 馨
+ * 日付：2025.06.17
  * 関数名: MoveToSearch
  * 機能概要: W2 スタート画面または W7 該当店舗なし画面から W5 検索画面へ遷移する。
  * 引数:
@@ -97,6 +100,7 @@ function MoveToSearch(string $action): void
 /**
  * M2.4 店舗表示一覧画面遷移処理 (C1 UI処理部)
  * 担当者：鈴木 馨
+ * 日付：2025.06.17
  * 関数名: MoveToStoreList
  * 機能概要: W8 店舗表示画面から W6 店舗表示一覧画面へ遷移する。
  * 引数:
@@ -117,6 +121,7 @@ function MoveToStoreList(string $action): void
 /**
  * M2.5 お気に入り画面遷移処理 (C1 UI処理部)
  * 担当者：樋口 智也
+ * 日付：2025.06.17
  * 関数名: MoveToFavorite
  * 機能概要: W2 スタート画面から W9 お気に入り画面へ遷移する。
  * 引数:
@@ -137,6 +142,7 @@ function MoveToFavorite(string $action): void
 /**
  * M2 画面遷移主処理 (C1 UI処理部)
  * 担当者：鈴木 馨
+ * 日付：2025.06.17
  * 関数名: NavigationMain
  * 機能概要: ユーザー操作に応じて適切な画面へ遷移する。
  * 引数:
