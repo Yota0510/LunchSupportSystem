@@ -1,9 +1,9 @@
 <?php
 /**
- * search_processing.php
+ * ファイル名：search_processing.php
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.15
+ * 日付：2025.06.10
  * 概要: C1 UI処理部 M4店舗検索主処理のうち、
  * 下位モジュール（GetSearchCondition, SendSearchRequest, DisplayStoreList, DisplayNoResult）
  * を定義するファイル。
@@ -15,6 +15,7 @@ require_once __DIR__ . '/../C3/SearchRequest.php';
 /**
  * M4.1 検索入力確認処理 (GetSearchCondition)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: W5検索画面の入力欄から、ジャンル・金額・距離の検索条件を取得し、
  * 入力値の基本的なチェックを行う。
  * 特に、E6「ジャンル、上限金額、上限距離のいずれも未設定だった場合」のエラーを検出する。
@@ -63,6 +64,7 @@ function GetSearchCondition(array $input): array
 /**
  * M4.2 店舗検索要求処理 (SendSearchRequest)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: 検索の要求をC3 検索処理部に送り、検索結果（店舗リスト、ステータス）を取得する。
  *
  * 引数： string $genre ジャンル。
@@ -82,6 +84,7 @@ function SendSearchRequest(string $genre, int $price, int $distance): array
 /**
  * M4.3 店舗表示一覧画面表示処理 (DisplayStoreList)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: 取得した店舗情報のリストをW6 店舗表示一覧画面へリダイレクトする。
  * この関数は直接HTMLを出力せず、search_results.phpへブラウザを転送する。
  * 検索条件はGETパラメータとしてsearch_results.phpに引き継がれる。
@@ -99,6 +102,7 @@ function DisplayStoreList(array $search_results)
 /**
  * M4.4 該当店舗なし画面表示処理 (DisplayNoResult)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: 検索結果が0件だった場合に、W7該当店舗なし画面へリダイレクトする。
  * この関数は直接HTMLを出力せず、no_results.phpへブラウザを転送する。
  *
