@@ -264,7 +264,7 @@ RegisterMain();
 
         <div class="form-content">
             <?php if (!empty($error_message)): ?>
-                <p class="error-message"><?php echo htmlspecialchars($error_message); ?></p>
+                <p class="error-message"><?php echo $error_message; ?></p>
             <?php endif; ?>
 
             <?php if (!empty($success_message)): ?>
