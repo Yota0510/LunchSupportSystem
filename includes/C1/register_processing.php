@@ -25,26 +25,41 @@ require_once __DIR__ . '/../C2/user_service.php';
  * - string $error_msg: エラーメッセージ（参照渡し）
  */
 function CheckRegisterInput(string $password, string $password_confirm, ?string &$error_msg = null): string {
-    $error_msg = '';
+    $error_msg = ''; // エラーメッセージを初期化
+    $has_error = false; // エラーが見つかったかどうかを示すフラグ
 
+    // --- パスワードの空チェック ---
     if (empty($password)) {
-        $error_msg .= 'パスワードが入力されていません。(E4) ';
-        return "NG_INPUT";
+        $error_msg .= 'パスワードが入力されていません。(E4) <br>';
+        $has_error = true;
     }
+    
+    // --- 確認用パスワードの空チェック ---
     if (empty($password_confirm)) {
-        $error_msg .= '確認用パスワードが入力されていません。(E4) ';
-        return "NG_INPUT";
+        $error_msg .= '確認用パスワードが入力されていません。(E4) <br>';
+        $has_error = true;
     }
-    if ($password !== $password_confirm) {
-        $error_msg .= 'パスワードと確認用パスワードが一致しません。(E8) ';
-        return "NG_INPUT";
+    
+    // --- パスワードと確認用パスワードの一致チェック ---
+    // ※空チェックの後に実行することで、空でないことを確認してから比較できる
+    if (!empty($password) && !empty($password_confirm) && $password !== $password_confirm) {
+        $error_msg .= 'パスワードと確認用パスワードが一致しません。(E8) <br>';
+        $has_error = true;
     }
-     if (strlen($password) > 16) {
-        $error_msg .= 'パスワードを16文字以下で入力してください。(E2) ';
-        return "NG_INPUT";
+    
+    // --- パスワードの長さチェック（16文字以下） ---
+    // ※パスワードが空の場合はすでにエラーになっているため、空でない場合のみ長さをチェック
+    if (!empty($password) && strlen($password) > 16) {
+        $error_msg .= 'パスワードを16文字以下で入力してください。(E2) <br>';
+        $has_error = true;
     }
 
-    return "OK"; // 入力チェックはOK
+    // 全てのチェックが終了した後、エラーがあったかどうかで最終的な結果を返す
+    if ($has_error) {
+        return "NG_INPUT";
+    } else {
+        return "OK";
+    }
 }
 
 /**
