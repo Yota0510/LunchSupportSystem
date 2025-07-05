@@ -33,14 +33,4 @@ function getDbConnection() {
     }
 }
 
-// 簡単な接続テスト (このファイルを直接ブラウザで開かない限り実行されない)
-// if (basename(__FILE__) == basename($_SERVER["SCRIPT_FILENAME"])) {
-//     try {
-//         $pdo = getDbConnection();
-//         echo "データベースに正常に接続できました！";
-//     } catch (Exception $e) {
-//         echo "データベース接続エラー: " . $e->getMessage();
-//     }
-// }
-
 ?>
