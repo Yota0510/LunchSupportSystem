@@ -32,8 +32,14 @@ function FetchStoreList(string $genre, int $price, int $distance): array
     // C7 店舗情報管理部 M1 店舗一覧取得主処理を呼び出す
     $c7_result = StoreSearchRequestMain($genre, $price, $distance);
 
+    // SearchResultがnullや空文字列の場合は空配列に変換
+    $search_result = $c7_result['SearchResult'];
+    if (empty($search_result) || !is_array($search_result)) {
+        $search_result = [];
+    }
+
     return [
-        'SearchResult' => $c7_result['SearchResult'],
+        'SearchResult' => $search_result,
         'is_success' => $c7_result['is_success'],
         'error_message' => $c7_result['error_message'] ?? ''
     ];
@@ -58,10 +64,16 @@ function CheckSearchStatus(array $search_result, bool $is_success, string $api_e
     $status = '';
     $error_message = '';
 
+    error_log('DEBUG: is_success=' . var_export($is_success, true));
+    error_log('DEBUG: search_result=' . print_r($search_result, true));
+    error_log('DEBUG: empty=' . (empty($search_result) ? 'true' : 'false'));
+    error_log('DEBUG: count(array_filter)=' . count(array_filter($search_result)));
+
+
     if (!$is_success) {
         $status = 'ERROR'; // E1: 通信失敗
         $error_message = $api_error_message;
-    } elseif (empty($search_result)) {
+    } elseif (empty($search_result) || count(array_filter($search_result)) === 0) {
         $status = 'NO_MATCH'; // E2: 検索結果で条件一致店舗がなかった場合
         $error_message = '検索条件に合う店舗が見つかりませんでした。(E2)';
     } else {
@@ -102,7 +114,6 @@ function SearchRequestMain(string $genre, int $price, int $distance): array
         $fetch_list_result['error_message']
     );
 
-    // error_messageは $check_status_result から取得するように修正
     return [
         'SearchResult' => $check_status_result['SearchResult'],
         'status' => $check_status_result['status'],
