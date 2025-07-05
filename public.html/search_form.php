@@ -3,7 +3,7 @@
  * ファイル名：search_form.php (W5 検索画面)
  * 版名：V1.1
  * 作成者：鈴木 馨
- * 日付：2025.06.15
+ * 日付：2025.07.05
  * 概要: 店舗検索の条件を入力するフォームを表示し、
  * フォーム送信時にM4 店舗検索主処理 (StoreSearchMain) を呼び出す。
  * 対応コンポーネント: C1 UI処理部
@@ -41,8 +41,8 @@ function StoreSearchMain(array $input): string
     // M4.2 店舗検索要求処理を呼び出す．
     $search_request_result = SendSearchRequest(
         $validation_result['genre'],
-        $validation_result['distance'],
-        $validation_result['price']
+        $validation_result['price'],
+        $validation_result['distance']
     );
 
     // 検索リクエストの結果ステータスに基づいて、次のアクションを決定する。
