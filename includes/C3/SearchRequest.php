@@ -1,11 +1,12 @@
 <?php
 /**
- * C3_SearchRequestMain.php
+ * ファイル名：SearchRequestMain.php
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.15
+ * 日付：2025.06.10
  * 概要: C3 検索処理部のモジュールを定義するファイル。
  * UIからの検索条件を受け取り、C7に検索要求を出し、結果の件数を確認してUIに返す。
+ * 対応コンポーネント: C3 検索処理部, M1 一覧検索主処理， M1,1店舗一覧取得処理，M1.2店舗一覧確認処理
  */
 
 // C7 店舗情報管理部のモジュールを読み込む
@@ -15,6 +16,7 @@ require_once __DIR__ . '/../C7/StoreInfoAPI.php';
 /**
  * C3 M1.1 店舗一覧取得処理 (FetchStoreList)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: ジャンル・金額・距離を検索条件としてC7 店舗情報管理部に送信し、店舗一覧データ（JSON）を取得する。
  *
  * 引数： string $genre ジャンル。
@@ -30,8 +32,14 @@ function FetchStoreList(string $genre, int $price, int $distance): array
     // C7 店舗情報管理部 M1 店舗一覧取得主処理を呼び出す
     $c7_result = StoreSearchRequestMain($genre, $price, $distance);
 
+    // SearchResultがnullや空文字列の場合は空配列に変換
+    $search_result = $c7_result['SearchResult'];
+    if (empty($search_result) || !is_array($search_result)) {
+        $search_result = [];
+    }
+
     return [
-        'SearchResult' => $c7_result['SearchResult'],
+        'SearchResult' => $search_result,
         'is_success' => $c7_result['is_success'],
         'error_message' => $c7_result['error_message'] ?? ''
     ];
@@ -40,6 +48,7 @@ function FetchStoreList(string $genre, int $price, int $distance): array
 /**
  * C3 M1.2 店舗一覧確認処理 (CheckSearchStatus)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: 取得したJSON件数をチェックし、検索結果の状態（OK, NO_MATCH, ERROR）を判定する。
  *
  * 引数： array $search_result M1.1で取得した店舗リスト。
@@ -55,10 +64,16 @@ function CheckSearchStatus(array $search_result, bool $is_success, string $api_e
     $status = '';
     $error_message = '';
 
+    error_log('DEBUG: is_success=' . var_export($is_success, true));
+    error_log('DEBUG: search_result=' . print_r($search_result, true));
+    error_log('DEBUG: empty=' . (empty($search_result) ? 'true' : 'false'));
+    error_log('DEBUG: count(array_filter)=' . count(array_filter($search_result)));
+
+
     if (!$is_success) {
         $status = 'ERROR'; // E1: 通信失敗
         $error_message = $api_error_message;
-    } elseif (empty($search_result)) {
+    } elseif (empty($search_result) || count(array_filter($search_result)) === 0) {
         $status = 'NO_MATCH'; // E2: 検索結果で条件一致店舗がなかった場合
         $error_message = '検索条件に合う店舗が見つかりませんでした。(E2)';
     } else {
@@ -75,6 +90,7 @@ function CheckSearchStatus(array $search_result, bool $is_success, string $api_e
 /**
  * C3 M1 一覧検索主処理 (SearchRequestMain)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.10
  * 機能概要: UIから受け取った検索条件（ジャンル・金額・距離）をもとに、
  * M1.1でC7に検索要求を送り店舗リストを取得し、M1.2で検索結果の件数を確認し、結果をUIへ返却する。
  *
@@ -98,7 +114,6 @@ function SearchRequestMain(string $genre, int $price, int $distance): array
         $fetch_list_result['error_message']
     );
 
-    // error_messageは $check_status_result から取得するように修正
     return [
         'SearchResult' => $check_status_result['SearchResult'],
         'status' => $check_status_result['status'],

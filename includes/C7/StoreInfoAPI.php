@@ -8,8 +8,9 @@
  * Google Places APIとの具体的な連携（URL生成、API呼び出し、レスポンスの整形）を担当する。
  */
 
-// Google Places APIキーを定義
-define('GOOGLE_PLACES_API_KEY', 'AIzaSyDZ2e4P7njfO8tIKbAdp3_2WYZIpJH3bSo'); 
+// Google Places APIキーを取得
+require_once __DIR__ . '/../../config/api_keys.php';
+
 
 // 検索の中心地点（芝浦工業大学豊洲キャンパスの緯度経度）
 define('DEFAULT_SEARCH_LOCATION_LAT', 35.6606); // 緯度
@@ -21,6 +22,7 @@ define('PLACES_API_TEXTSEARCH_ENDPOINT', 'https://maps.googleapis.com/maps/api/p
 /**
  * C7 M1.1 APIリクエストURL生成処理 (BuildPlaceAPIRequestURL)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.15
  * 機能概要: 検索条件（ジャンル・金額・距離）をもとに、Google Places APIリクエストURLを生成する。
  *
  * 引数： string $genre 検索するジャンル。
@@ -59,6 +61,7 @@ function BuildPlaceAPIRequestURL(string $genre, int $distance, int $price): stri
 /**
  * C7 M1.2 API検索要求処理 (RequestPlaceAPI)
  * 担当者: 鈴木 馨
+ * 日付：2025.06.15
  * 機能概要: M1.1で生成したURLを使ってGoogle Places API にHTTP GETリクエストを送り、レスポンスを取得する。
  *
  * 引数： string $request_url APIリクエストURLの文字列。

@@ -1,6 +1,6 @@
 <?php
 /**
- * search_results.php (W6 店舗表示一覧画面)
+ * ファイル名：search_results.php (W6 店舗表示一覧画面)
  * 版名：V1.0
  * 作成者：鈴木 馨
  * 日付：2025.06.15
@@ -301,7 +301,7 @@ $display_distance_km = $distance_param / 1000;
                             if ($price == 0) {
                                 echo '指定なし';
                             } elseif ($price >= 5000) {
-                                echo '5000円以上';
+                                echo '～5000円';
                             } else {
                                 echo '〜' . htmlspecialchars($price) . '円';
                             }
