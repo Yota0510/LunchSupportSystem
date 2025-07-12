@@ -9,9 +9,16 @@
  */
 
 session_start();
-$recommendedStores = $_SESSION['recommendedStores'] ?? [];
-// 使い終わったらクリア
-unset($_SESSION['recommendedStores']);
+require_once __DIR__ . '/../includes/C4/mood_diagnosis_logic.php';
+$recommendedStores = [];
+
+if (isset($_GET['diagnosis_id'])) {
+    // 診断IDから店舗情報を再取得
+    $recommendedStores = DiagnosisInquiry($_GET['diagnosis_id']);
+} elseif (isset($_SESSION['recommendedStores'])) {
+    $recommendedStores = $_SESSION['recommendedStores'];
+    unset($_SESSION['recommendedStores']);
+}
 
 /**
  * DisplayMoodCheckResult (M3.4 気分診断画面結果表示処理)
@@ -172,6 +179,10 @@ function DisplayMoodCheckResult($recommendedStores) {
             <div class="button-row-bottom">
                 <form action="store_detail.php" method="get" style="margin:0;">
                     <input type="hidden" name="place_id" value="<?= htmlspecialchars($recommendedStores[0]['store_id'] ?? '') ?>">
+                    <?php if (isset($_GET['diagnosis_id'])): ?>
+                        <input type="hidden" name="diagnosis_id" value="<?= htmlspecialchars($_GET['diagnosis_id']) ?>">
+                    <?php endif; ?>
+                    <input type="hidden" name="from" value="mood">
                     <button type="submit" class="back-button"<?= empty($recommendedStores[0]['store_id'] ?? '') ? ' disabled' : '' ?>>店舗詳細を見る</button>
                 </form>
                 <a href="start.php" class="back-button">スタートへ戻る</a>
