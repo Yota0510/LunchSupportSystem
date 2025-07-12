@@ -66,7 +66,7 @@ function SendMoodCheckRequest($question_number) {
         ]);
         $_SESSION['recommendedStores'] = $result['storeInfo'];
         if ($result['error']) {
-            // エラー時はエラー画面やメッセージに遷移してもよい（ここでは簡易的にエラー表示）
+            // エラー表示
             echo '<p>診断処理中にエラーが発生しました。時間をおいて再度お試しください。</p>';
             exit;
         }
