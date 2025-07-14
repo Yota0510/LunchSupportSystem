@@ -40,7 +40,7 @@ function CreateDiagnosisId(array $post): string {
  */
 function DiagnosisInquiry(string $diagnosis_id): array {
     try {
-        return GetStoreInfoByDiagnosisId($diagnosis_id);
+        return ManageStoreInfoMain($diagnosis_id);
     } catch (Throwable $e) {
         error_log('[DiagnosisInquiry] DB Error: ' . $e->getMessage());
         return [];

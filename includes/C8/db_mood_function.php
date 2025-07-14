@@ -51,4 +51,20 @@ function GetStoreInfoByDiagnosisId(string $diagnosis_id): array {
     }
 }
 
+
+/**
+ * ManageStoreInfoMain (M1 診断店舗情報管理主処理)
+ * 担当者：田口 陽太
+ * 機能概要：診断IDを引数として受け取り，M1.1でデータベース接読を行い，
+ * M1.2で該当店舗情報を検索し，それを診断結果としてC4気分診断処理部へ返す．
+ * 入力:
+ * - string $diagnosis_id: 4文字の診断ID（例: "1100"）
+ * 出力:
+ * - array $stores: 店舗情報の配列（例: [['store_id' => 1, 'store_name' => 'Store A', ...]）
+ */
+function ManageStoreInfoMain(string $diagnosis_id): array {
+    // getDbConnectionはGetStoreInfoByDiagnosisId内で呼ばれるため、ここでは直接呼ばない
+    return GetStoreInfoByDiagnosisId($diagnosis_id);
+}
+
 ?>
