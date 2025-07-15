@@ -111,7 +111,7 @@ function MoveToSearch(string $action): void
 function MoveToStoreList(string $action): void
 {
     if ($action === 'to_storelist') {
-        header('Location: search_results.php'); // 仮のファイル名。W6に相当する画面
+        header('Location: search_results.php');
         exit();
     } else {
         handleNavigationError("Invalid action '{$action}' for MoveToStoreList.");
