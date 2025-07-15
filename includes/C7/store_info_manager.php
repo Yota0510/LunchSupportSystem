@@ -1,6 +1,6 @@
 <?php
 /**
- * store_info_manager.php
+ * ファイル名：store_info_manager.php
  * 版名：V1.1
  * 担当者：小泉 優
  * 日付：2025.06.25
