@@ -3,25 +3,57 @@
  * ファイル名：search_results.php (W6 店舗表示一覧画面)
  * 版名：V1.0
  * 作成者：鈴木 馨
- * 日付：2025.06.15
+ * 日付：2025.07.15
  * 概要: 店舗検索の条件が一致する店舗一覧を表示する
  * 対応コンポーネント: C1 UI処理部
  * 対応モジュール: W5 検索画面のUI表示, M4.3 店舗表示一覧画面表示処理
  */
 
+session_start();
+
 // 必要なモジュールを読み込む
 require_once __DIR__ . '/../includes/C1/search_processing.php';
-
-// フォームから送信された値を取得
-$search_condition = GetSearchCondition($_GET);
-
-$genre = $search_condition['genre']; // 選択されたジャンル
-$distance_param = $search_condition['distance']; // 検索で指定された距離 (メートル単位)
-$price = $search_condition['price']; // 選択された金額
 
 $search_results = [];
 $api_error_message = '';
 
+// 検索条件の取得ロジック
+// 1. GETパラメータから検索条件を取得しようと試みる（フォームからの直接遷移）
+// 2. GETパラメータがない場合、セッションから以前の検索条件を読み込む（店舗詳細から戻るなど）
+if (!empty($_GET)) { 
+    $search_condition = GetSearchCondition($_GET);
+    // 正常な検索条件であればセッションに保存
+    if ($search_condition['is_valid']) {
+        $_SESSION['last_search_condition'] = $search_condition;
+    } else {
+        // GETパラメータはあったが不正だった場合（例：一部欠けているなど）
+        // セッションの検索条件をクリアして、エラー表示を優先
+        unset($_SESSION['last_search_condition']);
+    }
+} elseif (isset($_SESSION['last_search_condition'])) { 
+    // GETパラメータがないが、セッションに前回の検索条件がある場合
+    $search_condition = $_SESSION['last_search_condition'];
+    // セッションから読み込んだ場合でも有効性を再確認（念のため）
+    // GetSearchCondition は $_GET を前提としているため、ここでは直接バリデーションを適用する
+    // または、GetSearchCondition を $_SESSION からも読み込めるように修正する
+    // ここではシンプルに、セッションのデータが有効と仮定して進めるが、
+    // 必要であればここでさらにバリデーションロジックを追加
+    $search_condition['is_valid'] = true; // セッションに存在すれば有効と見なす
+} else { 
+    // GETパラメータもセッションにも検索条件がない場合（初回アクセスや直接アクセス）
+    // デフォルトの無効な検索条件を設定し、エラーメッセージを発生させる
+    $search_condition = [
+        'is_valid' => false,
+        'error_message' => 'ジャンル、距離、金額のいずれか一つ以上を選択してください。(E6)',
+        'genre' => '',
+        'distance' => 0,
+        'price' => 0
+    ];
+}
+
+$genre = $search_condition['genre'];
+$distance_param = $search_condition['distance'];
+$price = $search_condition['price'];
 
 if ($search_condition['is_valid']) {
     $result = SendSearchRequest($genre, $price, $distance_param);
@@ -286,7 +318,7 @@ $display_distance_km = $distance_param / 1000;
                 <div class="store-item">
                     <div class="store-header">
                         <div class="store-name">
-                            <a href="store_detail.php?place_id=<?php echo htmlspecialchars($store['place_id']); ?>">
+                            <a href="store_detail.php?place_id=<?php echo htmlspecialchars($store['place_id']); ?>&from=list">
                                 <?php echo htmlspecialchars($store['name']); ?>
                             </a>
                         </div>
