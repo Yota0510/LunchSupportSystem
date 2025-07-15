@@ -12,5 +12,5 @@
 - 他メンバー
 
 ## 使用技術
-- HTML / CSS / JavaScript
-- Firebase（仮）
+- HTML / CSS / PHP
+- SQLite
